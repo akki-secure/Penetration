@@ -103,6 +103,11 @@ docker compose logs -f target-ssh
 | FTP サーバー | `ftp 172.20.0.20` (Docker ネットワーク内から) |
 | SSH サーバー | `ssh developer@172.20.0.30` (Docker ネットワーク内から) |
 
+> **補足**: `localhost:8081` と `172.20.0.10:80` は同じサーバーへのアクセスです。
+> Docker がポートフォワードしているため、ホスト OS からは `localhost:8081` でアクセスできます。
+> Burp Suite など **ホスト OS で動くツール**は `localhost:8081` を、
+> nmap / ftp / ssh など **コンテナ内で動かすツール**は `172.20.0.10` を使います。
+
 FTP / SSH はホスト OS からポートフォワードしていないため、`docker exec` や同一 Docker ネットワーク内から接続してください。
 
 ```bash
