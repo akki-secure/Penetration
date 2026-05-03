@@ -14,9 +14,13 @@ SQLi・コマンドインジェクション・ファイルアップロード RCE
 7 つのフラグを取得していくハンズオン形式の学習ができます。
 
 ```bash
+# 起動 (初回)
 cd hacklab
 docker compose up --build
 # → http://localhost:8081 を開く
+
+# 停止
+docker compose down
 ```
 
 詳細は [hacklab/README.md](hacklab/README.md) を参照してください。
