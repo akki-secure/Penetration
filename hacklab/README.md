@@ -113,6 +113,54 @@ ssh developer@172.20.0.30
 
 ---
 
+## 使えるツールと攻撃例
+
+| ツール | 用途 | コマンド例 |
+|--------|------|-----------|
+| **nmap** | ポートスキャン | `nmap -sV 172.20.0.0/24` |
+| **Burp Suite** | HTTP 傍受・改ざん (SQLi / RCE) | ブラウザのプロキシを `127.0.0.1:8080` に設定して `http://localhost:8081` を開く |
+| **sqlmap** | SQL インジェクション自動化 | `sqlmap -u "http://localhost:8081/login" --data="username=admin&password=pass" --dbs` |
+| **curl** | robots.txt・FTP 匿名ログイン確認 | `curl http://localhost:8081/robots.txt` |
+| **Hydra** | SSH ブルートフォース | `hydra -l developer -P wordlist.txt ssh://172.20.0.30` |
+| **ftp** | FTP 匿名ログイン | `ftp 172.20.0.20` → ユーザー名 `anonymous` |
+
+> nmap・Hydra・ftp など Docker ネットワーク内のホストへ接続するツールは、
+> `docker exec -it hacklab-web sh` でコンテナ内に入ってから実行してください。
+
+---
+
+## 外部 IP を誤って攻撃しないために
+
+攻撃ツールを使う際は **必ずターゲット IP を明示**し、ホスト OS や外部インターネットを対象にしないよう注意してください。
+
+**安全な使い方:**
+
+```bash
+# ターゲット IP を明示する (172.20.0.0/24 の範囲のみ)
+nmap -sV 172.20.0.10
+sqlmap -u "http://172.20.0.10/login" ...
+hydra -l developer -P wordlist.txt ssh://172.20.0.30
+```
+
+**やってはいけないこと:**
+
+```bash
+# NG: ホスト OS や外部ドメインを対象にする
+nmap 192.168.x.x       # 自分のホームネットワーク → 絶対 NG
+sqlmap -u "https://example.com/..."  # 外部サイト → 不正アクセス
+```
+
+**Docker ネットワーク内に閉じ込めて使う (推奨):**
+
+```bash
+# target-web コンテナ内から攻撃ツールを実行すれば
+# 通信が hacklab-net 内に完全に閉じる
+docker exec -it hacklab-web sh
+# → ここから nmap / curl / ftp / ssh を実行する
+```
+
+---
+
 ## チャレンジ概要 (全 7 フラグ)
 
 | Stage | タイトル | 技術 | フラグ |
