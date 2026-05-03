@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}偵察ツール{% endblock %}
+
+{% block content %}
+<h1>🔍 偵察フェーズ</h1>
+<p class="subtitle">ポートスキャンと Web 探索でターゲットの情報を収集しましょう。</p>
+
+<!-- Stage 1: ポートスキャン -->
+<div class="card">
+  <h3>Stage 1 — ポートスキャナー</h3>
+  <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem;">
+    TCP ポートに接続を試みて開放状態を確認します。
+    ペネトレーションテストの最初のステップです。
+  </p>
+
+  <div class="grid-2">
+    <div>
+      <div class="form-group">
+        <label>ターゲット IP</label>
+        <input id="scan-target" value="172.20.0.10" placeholder="例: 172.20.0.10">
+      </div>
+      <div class="form-group">
+        <label>スキャンするポート (カンマ区切り)</label>
+        <input id="scan-ports" value="21,22,80,443,3306,8080">
+      </div>
+      <button class="btn" onclick="runScan()">スキャン開始</button>
+      <button class="btn-hint" data-hint="hint-scan" style="margin-left:0.5rem;">💡 ヒント</button>
+    </div>
+    <div>
+      <div class="hint-box" id="hint-scan">
+        <strong>ヒント:</strong><br>
+        172.20.0.10 (Web), 172.20.0.20 (FTP), 172.20.0.30 (SSH) の
+        3 つのターゲットを順番にスキャンしてみましょう。<br><br>
+        FLAG{recon_network_master} は、いずれかのターゲットで
+        開放ポートを発見すると自動的に付与されます。
+      </div>
+    </div>
+  </div>
+
+  <div class="terminal" id="scan-output">ここにスキャン結果が表示されます...</div>
+</div>
+
+<!-- Stage 2: Web 探索 -->
+<div class="card">
+  <h3>Stage 2 — HTTP リクエストビルダー (Web 探索)</h3>
+  <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem;">
+    Web サーバーに HTTP リクエストを送り、隠されたページを発見します。
+    まず robots.txt を確認してみましょう。
+  </p>
+
+  <div class="grid-2">
+    <div>
+      <div class="form-group">
+        <label>URL</label>
+        <input id="http-url" value="http://172.20.0.10/robots.txt" placeholder="http://172.20.0.10/...">
+      </div>
+      <div class="form-group">
+        <label>メソッド</label>
+        <select id="http-method">
+          <option>GET</option>
+          <option>POST</option>
+        </select>
+      </div>
+      <div class="form-group" id="http-body-group" style="display:none;">
+        <label>リクエストボディ (URL エンコード: key=value&key2=value2)</label>
+        <input id="http-body" placeholder="username=admin&password=test">
+      </div>
+      <button class="btn" onclick="sendHttp()">送信</button>
+      <button class="btn-hint" data-hint="hint-web" style="margin-left:0.5rem;">💡 ヒント</button>
+    </div>
+    <div>
+      <div class="hint-box" id="hint-web">
+        <strong>確認すべき URL (順番に試してみましょう):</strong><br>
+        1. <code>http://172.20.0.10/robots.txt</code> → 隠しパスを確認<br>
+        2. <code>http://172.20.0.10/backup/db.sql</code> → DB スキーマ漏洩<br>
+        3. <code>http://172.20.0.10/</code> → バナー情報<br><br>
+        robots.txt に FLAG が隠れているかもしれません...
+      </div>
+    </div>
+  </div>
+
+  <div class="terminal" id="http-output">ここにレスポンスが表示されます...</div>
+
+  <!-- クイックリンク -->
+  <div style="margin-top:0.75rem;font-size:0.85rem;color:var(--muted);">
+    クイックアクセス:
+    <button class="btn-hint" onclick="setUrl('http://172.20.0.10/')">/ (トップ)</button>
+    <button class="btn-hint" onclick="setUrl('http://172.20.0.10/robots.txt')">robots.txt</button>
+    <button class="btn-hint" onclick="setUrl('http://172.20.0.10/backup/db.sql')">backup/db.sql</button>
+    <button class="btn-hint" onclick="setUrl('http://172.20.0.10/admin')">admin</button>
+    <button class="btn-hint" onclick="setUrl('http://172.20.0.10/file?name=readme.txt')">file?name=</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // メソッド変更で body フォームを表示/非表示
+  document.getElementById('http-method').addEventListener('change', function() {
+    document.getElementById('http-body-group').style.display =
+      this.value === 'POST' ? 'block' : 'none';
+  });
+
+  function setUrl(url) {
+    document.getElementById('http-url').value = url;
+    sendHttp();
+  }
+
+  // ポートスキャン実行
+  async function runScan() {
+    const target = document.getElementById('scan-target').value.trim();
+    const portsStr = document.getElementById('scan-ports').value;
+    const ports = portsStr.split(',').map(p => parseInt(p.trim())).filter(p => !isNaN(p));
+    const term = document.getElementById('scan-output');
+
+    termClear(term);
+    termPrint(term, `[*] ターゲット: ${target}`, 'info');
+    termPrint(term, `[*] スキャンするポート: ${ports.join(', ')}`, 'info');
+    termPrint(term, '[*] スキャン中...', 'info');
+
+    try {
+      const r = await fetch('/api/scan', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({target, ports, timeout: 1.5})
+      });
+      const d = await r.json();
+
+      if (d.error) { termPrint(term, `[!] エラー: ${d.error}`, 'err'); return; }
+
+      d.results.forEach(res => {
+        if (res.state === 'open') {
+          const banner = res.banner ? ` | バナー: ${res.banner.substring(0, 60)}` : '';
+          termPrint(term, `[+] ${target}:${res.port}/tcp  OPEN  ${res.service}${banner}`, 'info');
+        } else {
+          termPrint(term, `[-] ${target}:${res.port}/tcp  closed`);
+        }
+      });
+
+      const open = d.results.filter(r => r.state === 'open');
+      termPrint(term, `\n[*] 完了: ${open.length} ポートがオープン`);
+
+      if (d.flag) {
+        termPrint(term, `\n🚩 ${d.flag}`, 'flag');
+        termPrint(term, '   偵察フラグを獲得しました！', 'info');
+      }
+    } catch(e) {
+      termPrint(term, `[!] 接続エラー: ${e}`, 'err');
+    }
+  }
+
+  // HTTP リクエスト送信
+  async function sendHttp() {
+    const url = document.getElementById('http-url').value.trim();
+    const method = document.getElementById('http-method').value;
+    const bodyStr = document.getElementById('http-body').value;
+    const term = document.getElementById('http-output');
+
+    termClear(term);
+    termPrint(term, `[*] ${method} ${url}`, 'info');
+
+    // POST ボディをパース
+    let body = {};
+    if (method === 'POST' && bodyStr) {
+      bodyStr.split('&').forEach(pair => {
+        const [k, v] = pair.split('=');
+        if (k) body[decodeURIComponent(k)] = decodeURIComponent(v || '');
+      });
+    }
+
+    // GET の場合はクエリ文字列をパース
+    let params = {};
+    if (method === 'GET' && url.includes('?')) {
+      const qs = url.split('?')[1];
+      qs.split('&').forEach(pair => {
+        const [k, v] = pair.split('=');
+        if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
+      });
+    }
+
+    try {
+      const r = await fetch('/api/http', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({method, url: url.split('?')[0], params, body})
+      });
+      const d = await r.json();
+
+      if (d.error) { termPrint(term, `[!] エラー: ${d.error}`, 'err'); return; }
+
+      termPrint(term, `[+] HTTP ${d.status_code}`, 'info');
+      // 重要なヘッダーだけ表示
+      const importantHeaders = ['server', 'x-powered-by', 'content-type', 'www-authenticate'];
+      Object.entries(d.headers).forEach(([k, v]) => {
+        if (importantHeaders.includes(k.toLowerCase())) {
+          termPrint(term, `    ${k}: ${v}`, 'info');
+        }
+      });
+      termPrint(term, '\n--- レスポンスボディ ---');
+      termPrint(term, d.body.substring(0, 3000));
+
+      // フラグ自動検出
+      await autoDetectFlag(d.body, term);
+
+    } catch(e) {
+      termPrint(term, `[!] エラー: ${e}`, 'err');
+    }
+  }
+</script>
+{% endblock %}

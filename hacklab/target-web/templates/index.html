@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}TechNova Solutions — ITコンサルティング{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <h1>テクノロジーで、<br>未来を切り拓く</h1>
+  <p>TechNova Solutions は、クラウド・セキュリティ・DX 推進を通じて<br>お客様のビジネス変革を支援するITコンサルティング企業です。</p>
+  <a href="/#services" class="btn btn-white">サービス詳細</a>
+  &nbsp;
+  <a href="/#contact" class="btn" style="background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.6);">お問い合わせ</a>
+</div>
+
+<!-- 実績バナー -->
+<div style="background:#fff;border-bottom:1px solid #e0e8f0;padding:28px 40px;">
+  <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-around;flex-wrap:wrap;gap:20px;text-align:center;">
+    <div><div style="font-size:2rem;font-weight:700;color:#0055a5;">350<span style="font-size:1.2rem;">社+</span></div><div style="font-size:0.85rem;color:#777;margin-top:4px;">導入実績</div></div>
+    <div><div style="font-size:2rem;font-weight:700;color:#0055a5;">15<span style="font-size:1.2rem;">年</span></div><div style="font-size:0.85rem;color:#777;margin-top:4px;">業界経験</div></div>
+    <div><div style="font-size:2rem;font-weight:700;color:#0055a5;">98<span style="font-size:1.2rem;">%</span></div><div style="font-size:0.85rem;color:#777;margin-top:4px;">顧客継続率</div></div>
+    <div><div style="font-size:2rem;font-weight:700;color:#0055a5;">24<span style="font-size:1.2rem;">/7</span></div><div style="font-size:0.85rem;color:#777;margin-top:4px;">サポート体制</div></div>
+  </div>
+</div>
+
+<div class="section" id="services">
+  <h2 class="section-title">提供サービス</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">☁️</div>
+      <h3>クラウドインフラ構築</h3>
+      <p>AWS・Azure・GCP を活用したスケーラブルなクラウド環境の設計・構築・運用保守を一括サポートします。</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h3>セキュリティコンサルティング</h3>
+      <p>脆弱性診断・ペネトレーションテスト・セキュリティポリシー策定など、包括的なセキュリティ対策を提供します。</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>DX推進支援</h3>
+      <p>業務プロセスのデジタル化・自動化を推進し、企業全体の生産性向上と競争力強化を実現します。</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛠️</div>
+      <h3>システム開発・保守</h3>
+      <p>要件定義からリリース後の運用保守まで、お客様のシステムライフサイクル全体をトータルでサポートします。</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📡</div>
+      <h3>ネットワーク設計・構築</h3>
+      <p>企業ネットワークの設計・構築・監視を担い、安定した業務基盤を実現します。</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎓</div>
+      <h3>ITトレーニング</h3>
+      <p>社員向けIT研修・セキュリティ啓発トレーニングで、組織全体のITリテラシーを底上げします。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ニュース -->
+<div style="background:#f0f5ff;padding:60px 40px;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <h2 class="section-title">ニュース・お知らせ</h2>
+    <ul class="notice-list">
+      <li><span class="date">2024-12-18</span><span class="tag">プレスリリース</span>東京証券取引所グロース市場への上場申請を行いました。</li>
+      <li><span class="date">2024-12-10</span><span class="tag">受賞</span>「ITソリューション大賞 2024」セキュリティ部門で優秀賞を受賞しました。</li>
+      <li><span class="date">2024-11-28</span><span class="tag">採用</span>2025年度新卒採用エントリーを開始しました。</li>
+      <li><span class="date">2024-11-15</span><span class="tag">導入事例</span>大手製造業 A 社での DX 推進プロジェクト事例を公開しました。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 社員ログイン導線 -->
+<div style="background:#003366;padding:60px 40px;text-align:center;">
+  <h2 style="color:#fff;font-size:1.4rem;margin-bottom:12px;">社員・パートナーの方はこちら</h2>
+  <p style="color:#99bbdd;margin-bottom:24px;font-size:0.95rem;">社内ポータルにアクセスするには認証が必要です。IDをお持ちの方はログインしてください。</p>
+  <a href="/login" class="btn btn-white">社員ポータルへログイン</a>
+</div>
+
+<div class="section" id="contact">
+  <h2 class="section-title">お問い合わせ</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">📧</div>
+      <h3>メール</h3>
+      <p>info@technova-solutions.co.jp<br><small style="color:#aaa;">営業時間内に返信いたします</small></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📞</div>
+      <h3>電話</h3>
+      <p>03-4567-8901<br><small style="color:#aaa;">平日 9:00〜18:00</small></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏢</div>
+      <h3>所在地</h3>
+      <p>東京都千代田区丸の内2-4-1<br><small style="color:#aaa;">TechNova ビル 12F</small></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

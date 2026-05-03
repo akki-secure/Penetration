@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}ネットワーク診断 — TechNova Solutions{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <h1>🔧 ネットワーク診断ツール</h1>
+  <p>ITインフラ担当者向け — 疎通確認・サーバー診断</p>
+</div>
+
+<div class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
+    <div>
+      <h2 class="section-title">Ping 疎通確認</h2>
+      <div style="background:#fff;border-radius:10px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <form id="pingForm">
+          <div class="form-group">
+            <label>ホスト名 / IP アドレス</label>
+            <input type="text" id="pingHost" name="host" placeholder="例: 172.20.0.10" value="127.0.0.1">
+          </div>
+          <button type="submit" class="form-btn">診断を実行</button>
+        </form>
+        <div id="pingResult" style="margin-top:16px;display:none;">
+          <div style="background:#1a1a2e;color:#a0c4a0;border-radius:6px;padding:16px;font-family:monospace;font-size:0.85rem;white-space:pre-wrap;max-height:200px;overflow-y:auto;" id="pingOutput"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="section-title">よく使うターゲット</h2>
+      <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <table>
+          <thead><tr><th>サーバー</th><th>IP</th></tr></thead>
+          <tbody>
+            <tr><td>Web サーバー</td><td><code>172.20.0.10</code></td></tr>
+            <tr><td>FTP サーバー</td><td><code>172.20.0.20</code></td></tr>
+            <tr><td>SSH サーバー</td><td><code>172.20.0.30</code></td></tr>
+            <tr><td>ゲートウェイ</td><td><code>172.20.0.1</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('pingForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const host = document.getElementById('pingHost').value;
+  const resultDiv = document.getElementById('pingResult');
+  const outputDiv = document.getElementById('pingOutput');
+  outputDiv.textContent = '診断中...';
+  resultDiv.style.display = 'block';
+  try {
+    const resp = await fetch('/ping?host=' + encodeURIComponent(host));
+    const data = await resp.json();
+    outputDiv.textContent = data.output || data.error || JSON.stringify(data, null, 2);
+    if (data.flag) outputDiv.textContent += '\n\n' + data.flag;
+  } catch(err) {
+    outputDiv.textContent = 'エラー: ' + err.message;
+  }
+});
+</script>
+{% endblock %}

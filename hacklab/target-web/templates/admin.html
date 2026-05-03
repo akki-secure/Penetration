@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}管理者パネル — TechNova Solutions{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <h1>⚙️ 管理者パネル</h1>
+  <p>システム管理者専用ページ — TechNova Solutions Internal</p>
+</div>
+
+<div class="section">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:40px;">
+    <div style="background:#fff;border-radius:8px;padding:20px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.07);">
+      <div style="font-size:2rem;color:#0055a5;font-weight:700;">{{ users|length }}</div>
+      <div style="font-size:0.85rem;color:#888;margin-top:4px;">登録ユーザー数</div>
+    </div>
+    <div style="background:#fff;border-radius:8px;padding:20px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.07);">
+      <div style="font-size:2rem;color:#0a6e2a;font-weight:700;">Online</div>
+      <div style="font-size:0.85rem;color:#888;margin-top:4px;">システム状態</div>
+    </div>
+    <div style="background:#fff;border-radius:8px;padding:20px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.07);">
+      <div style="font-size:1.1rem;color:#555;font-weight:600;">FlaskApp/1.0</div>
+      <div style="font-size:0.85rem;color:#888;margin-top:4px;">アプリバージョン</div>
+    </div>
+    <div style="background:#fff;border-radius:8px;padding:20px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.07);">
+      <div style="font-size:1.1rem;color:#555;font-weight:600;">Python 3.11</div>
+      <div style="font-size:0.85rem;color:#888;margin-top:4px;">ランタイム</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">ユーザー管理</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>ユーザー名</th>
+          <th>パスワード (hash)</th>
+          <th>権限</th>
+          <th>備考</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u[0] }}</td>
+          <td><strong>{{ u[1] }}</strong></td>
+          <td><code style="font-size:0.8rem;color:#888;">{{ u[2] }}</code></td>
+          <td><span class="badge {{ 'badge-admin' if u[3]=='admin' else 'badge-user' }}">{{ u[3] }}</span></td>
+          <td style="color:#777;font-size:0.85rem;">{{ u[4] or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:32px;">
+    <h2 class="section-title">システムログ（直近）</h2>
+    <div style="background:#1a1a2e;color:#a0c4a0;border-radius:8px;padding:20px;font-family:monospace;font-size:0.85rem;line-height:1.8;">
+      <div>[2024-12-20 09:12:34] INFO  User 'admin' logged in from 172.20.0.100</div>
+      <div>[2024-12-20 08:55:01] INFO  DB backup completed successfully</div>
+      <div>[2024-12-19 23:00:00] INFO  Scheduled maintenance task executed</div>
+      <div>[2024-12-19 17:44:22] WARN  Failed login attempt for user 'guest'</div>
+      <div>[2024-12-19 15:30:10] INFO  File uploaded: report_q4.pdf (172.20.0.100)</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

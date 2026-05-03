@@ -1,0 +1,72 @@
+# ============================================================
+# HackLab — ローカル完結型ペネトレーションテスト練習環境
+# 全コンテナは hacklab-net 内に閉じる。外部には attacker-ui:8080 のみ公開。
+# ============================================================
+
+networks:
+  hacklab-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+    # internal: true にすると外部インターネット接続を完全遮断できる
+    # (ビルド時は false にしておく必要があるため、起動後に切り替えも可)
+
+services:
+
+  # ----------------------------------------------------------
+  # 攻撃者コンソール: ブラウザから操作する "ハッキングツール" UI
+  # ホスト側 8080 番でアクセス → http://localhost:8080
+  # ----------------------------------------------------------
+  attacker-ui:
+    build: ./attacker-ui
+    container_name: hacklab-attacker
+    ports:
+      - "8080:5000"
+    networks:
+      hacklab-net:
+        ipv4_address: 172.20.0.100
+    depends_on:
+      - target-web
+      - target-ftp
+      - target-ssh
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=development
+
+  # ----------------------------------------------------------
+  # ターゲット Web サーバー: 複数の脆弱性を意図的に持つ Flask アプリ
+  # IP: 172.20.0.10  ポート: 80
+  # ----------------------------------------------------------
+  target-web:
+    build: ./target-web
+    container_name: hacklab-web
+    networks:
+      hacklab-net:
+        ipv4_address: 172.20.0.10
+    restart: unless-stopped
+    # ホストには公開しない (attacker-ui 経由でのみアクセス)
+
+  # ----------------------------------------------------------
+  # ターゲット FTP サーバー: 匿名ログイン許可・認証情報ヒントを内包
+  # IP: 172.20.0.20  ポート: 21
+  # ----------------------------------------------------------
+  target-ftp:
+    build: ./target-ftp
+    container_name: hacklab-ftp
+    networks:
+      hacklab-net:
+        ipv4_address: 172.20.0.20
+    restart: unless-stopped
+
+  # ----------------------------------------------------------
+  # ターゲット SSH サーバー: 弱いパスワードで侵入可能
+  # IP: 172.20.0.30  ポート: 22
+  # ----------------------------------------------------------
+  target-ssh:
+    build: ./target-ssh
+    container_name: hacklab-ssh
+    networks:
+      hacklab-net:
+        ipv4_address: 172.20.0.30
+    restart: unless-stopped

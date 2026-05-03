@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}ファイル共有 — TechNova Solutions{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <h1>📁 社内ドキュメント共有</h1>
+  <p>社内ファイルのアップロード・共有ポータル</p>
+</div>
+
+<div class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
+    <div>
+      <h2 class="section-title">ファイルをアップロード</h2>
+      <div style="background:#fff;border-radius:10px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>ファイルを選択</label>
+            <input type="file" name="file" style="padding:8px;">
+          </div>
+          <div class="form-group">
+            <label>共有先部署</label>
+            <select>
+              <option>全社</option>
+              <option>営業部</option>
+              <option>技術部</option>
+              <option>管理部</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>コメント（任意）</label>
+            <textarea rows="3" placeholder="ファイルの説明を入力..."></textarea>
+          </div>
+          <button type="submit" class="form-btn">アップロード</button>
+        </form>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="section-title">最近のファイル</h2>
+      <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <table>
+          <thead>
+            <tr><th>ファイル名</th><th>更新日</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>📄 report_q4_2024.pdf</td><td>12/20</td></tr>
+            <tr><td>📊 budget_2025.xlsx</td><td>12/18</td></tr>
+            <tr><td>📝 meeting_minutes.docx</td><td>12/15</td></tr>
+            <tr><td>🖼️ company_logo_v3.png</td><td>12/10</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

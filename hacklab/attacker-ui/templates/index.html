@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}ダッシュボード{% endblock %}
+
+{% block content %}
+<h1>⚡ HackLab — ペネトレーションテスト練習環境</h1>
+<p class="subtitle">
+  ローカル完結型のやられアプリです。偵察から侵入まで全 6 ステージに挑戦しよう。<br>
+  対象ネットワーク: <strong>172.20.0.0/24</strong> (このブラウザの外には一切出ません)
+</p>
+
+<!-- 進捗バー -->
+<div class="card">
+  <h3>🏆 スコア: {{ score }} / {{ total }} フラグ取得済み</h3>
+  <div style="background:var(--bg);border-radius:4px;height:12px;margin-top:0.5rem;overflow:hidden;">
+    <div style="background:var(--green);height:100%;width:{{ (score/total*100)|int }}%;transition:width 0.5s;"></div>
+  </div>
+  {% if score == total %}
+  <p style="color:var(--green);margin-top:0.5rem;">🎉 全フラグ取得！おめでとうございます！</p>
+  {% endif %}
+</div>
+
+<!-- ターゲット情報 -->
+<div class="card">
+  <h3>🎯 ターゲット一覧</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <thead>
+      <tr style="color:var(--muted);border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:0.4rem;">ホスト</th>
+        <th style="text-align:left;padding:0.4rem;">IP アドレス</th>
+        <th style="text-align:left;padding:0.4rem;">ポート</th>
+        <th style="text-align:left;padding:0.4rem;">サービス</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.4rem;">target-web</td>
+        <td style="padding:0.4rem;color:var(--cyan);">172.20.0.10</td>
+        <td style="padding:0.4rem;">80</td>
+        <td style="padding:0.4rem;">HTTP (Flask Web App)</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.4rem;">target-ftp</td>
+        <td style="padding:0.4rem;color:var(--cyan);">172.20.0.20</td>
+        <td style="padding:0.4rem;">21</td>
+        <td style="padding:0.4rem;">FTP (vsftpd)</td>
+      </tr>
+      <tr>
+        <td style="padding:0.4rem;">target-ssh</td>
+        <td style="padding:0.4rem;color:var(--cyan);">172.20.0.30</td>
+        <td style="padding:0.4rem;">22</td>
+        <td style="padding:0.4rem;">SSH (OpenSSH)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ステージ一覧 -->
+<h2>📋 ミッション一覧</h2>
+
+{% set stage_defs = [
+  ("1", "🔍 ネットワーク偵察", "recon",
+   "ポートスキャンで 172.20.0.0/24 上のホストとサービスを特定せよ",
+   "FLAG{recon_network_master}"),
+  ("2", "🌐 Web 探索", "recon",
+   "robots.txt や /backup を調べ、隠された情報を収集せよ",
+   "FLAG{web_recon_complete}"),
+  ("3", "📁 FTP 匿名ログイン", "exploit",
+   "FTP サーバーに anonymous でログインし、ファイルを取得せよ",
+   "FLAG{ftp_anonymous_pwned}"),
+  ("4", "💉 SQL インジェクション", "exploit",
+   "/login に SQL インジェクションを仕掛け、admin の FLAG を抽出せよ",
+   "FLAG{sql_injection_champion}"),
+  ("5a", "💥 コマンドインジェクション", "exploit",
+   "/ping エンドポイントにコマンドを注入して RCE を達成せよ",
+   "FLAG{command_injection_rce}"),
+  ("5b", "🐚 Web シェル", "exploit",
+   "/upload にスクリプトをアップロードして /run で実行せよ",
+   "FLAG{webshell_deployed}"),
+  ("6", "🔐 SSH 侵入", "exploit",
+   "FTP で入手した認証情報で SSH ログインし flag.txt を読め",
+   "FLAG{ssh_foothold_established}"),
+] %}
+
+{% for num, title, page, desc, flag in stage_defs %}
+<div class="stage-card {% if flag in flags %}done{% endif %}">
+  <div class="stage-num">Stage {{ num }}</div>
+  <div class="stage-title">
+    {{ title }}
+    {% if flag in flags %}<span style="color:var(--green);font-size:0.8rem;">✓ 完了</span>{% endif %}
+  </div>
+  <p style="color:var(--muted);font-size:0.85rem;margin:0.25rem 0 0.5rem;">{{ desc }}</p>
+  <a href="/{{ page }}" class="btn btn-cyan" style="font-size:0.8rem;padding:0.3rem 0.8rem;">
+    ツールを開く →
+  </a>
+  {% if flag in flags %}
+  <span class="flag-badge">{{ flag }}</span>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}
