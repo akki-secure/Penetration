@@ -1,6 +1,5 @@
 # ============================================================
 # HackLab — ローカル完結型ペネトレーションテスト練習環境
-# 全コンテナは hacklab-net 内に閉じる。外部には attacker-ui:8080 のみ公開。
 # ============================================================
 
 networks:
@@ -15,37 +14,18 @@ networks:
 services:
 
   # ----------------------------------------------------------
-  # 攻撃者コンソール: ブラウザから操作する "ハッキングツール" UI
-  # ホスト側 8080 番でアクセス → http://localhost:8080
-  # ----------------------------------------------------------
-  attacker-ui:
-    build: ./attacker-ui
-    container_name: hacklab-attacker
-    ports:
-      - "8080:5000"
-    networks:
-      hacklab-net:
-        ipv4_address: 172.20.0.100
-    depends_on:
-      - target-web
-      - target-ftp
-      - target-ssh
-    restart: unless-stopped
-    environment:
-      - FLASK_ENV=development
-
-  # ----------------------------------------------------------
   # ターゲット Web サーバー: 複数の脆弱性を意図的に持つ Flask アプリ
   # IP: 172.20.0.10  ポート: 80
   # ----------------------------------------------------------
   target-web:
     build: ./target-web
     container_name: hacklab-web
+    ports:
+      - "8081:80"
     networks:
       hacklab-net:
         ipv4_address: 172.20.0.10
     restart: unless-stopped
-    # ホストには公開しない (attacker-ui 経由でのみアクセス)
 
   # ----------------------------------------------------------
   # ターゲット FTP サーバー: 匿名ログイン許可・認証情報ヒントを内包
