@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}社員ポータル — TechNova Solutions{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <h1>ようこそ、{{ username }} さん</h1>
+  <p>TechNova Solutions 社員ポータル &nbsp;|&nbsp; 権限: {{ role }}
+    {% if flag %}&nbsp;|&nbsp; <code style="background:rgba(255,255,255,0.15);padding:2px 8px;border-radius:4px;font-size:0.85rem;letter-spacing:0.05em;">{{ flag }}</code>{% endif %}
+  </p>
+</div>
+
+<div class="section">
+  <h2 class="section-title">クイックアクセス</h2>
+  <div class="portal-grid">
+    <a href="/upload" class="portal-card">
+      <div class="card-label">📁 ドキュメント</div>
+      <div class="card-title">ファイル共有</div>
+      <div class="card-desc">社内ドキュメントのアップロード・共有</div>
+    </a>
+    <a href="/tools" class="portal-card">
+      <div class="card-label">🔧 インフラ</div>
+      <div class="card-title">ネットワーク診断</div>
+      <div class="card-desc">疎通確認・ネットワーク診断ツール</div>
+    </a>
+    <a href="/admin" class="portal-card">
+      <div class="card-label">⚙️ 管理</div>
+      <div class="card-title">管理者パネル</div>
+      <div class="card-desc">ユーザー管理・システム設定（要権限）</div>
+    </a>
+  </div>
+
+  <div style="margin-top:40px;">
+    <h2 class="section-title">お知らせ</h2>
+    <ul class="notice-list">
+      <li><span class="date">2024-12-20</span><span class="tag">重要</span>年末年始の営業時間について: 12/28〜1/5 は休業となります。</li>
+      <li><span class="date">2024-12-18</span><span class="tag">IT</span>VPN クライアントのバージョンアップを実施しました。各自アップデートをお願いします。</li>
+      <li><span class="date">2024-12-15</span><span class="tag">セキュリティ</span>フィッシングメールに関する注意喚起。不審なメールは IT サポートへご連絡ください。</li>
+      <li><span class="date">2024-12-10</span><span class="tag">人事</span>2025年度採用説明会の日程が確定しました。採用サイトをご確認ください。</li>
+      <li><span class="date">2024-12-05</span><span class="tag">IT</span>社内ファイル共有サービスのメンテナンスを 12/22 深夜に実施予定です。</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
