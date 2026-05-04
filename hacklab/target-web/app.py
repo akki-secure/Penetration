@@ -11,6 +11,7 @@ target-web — 意図的脆弱性を含む Web サーバー (教育目的)
   6. デフォルト認証情報 (admin / hackme123)
 """
 
+import hashlib
 import os
 import sqlite3
 import subprocess
@@ -89,12 +90,13 @@ def login():
 
     username = request.form.get("username", "")
     password = request.form.get("password", "")
+    password_md5 = hashlib.md5(password.encode()).hexdigest()
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     # 【脆弱性】SQL インジェクション: f-string で直接埋め込み (絶対に真似しないこと)
-    query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
+    query = f"SELECT * FROM users WHERE username='{username}' AND password='{password_md5}'"
     try:
         c.execute(query)
         rows = c.fetchall()
@@ -117,7 +119,7 @@ def login():
             flag=all_flags or flag,
         )
 
-    return render_template("login.html", error="ユーザー名またはパスワードが違います。")
+    return render_template("login.html", error="ユーザー名またはパスワードが違います。"), 401
 
 
 # -------------------------------------------------------
