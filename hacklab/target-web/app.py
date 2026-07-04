@@ -112,12 +112,14 @@ def login():
         flag = rows[0][4] if rows[0][4] else ""
         # 複数行取得された場合も全フラグを結合して表示（UNION SELECT 対策なし）
         all_flags = " | ".join(r[4] for r in rows if r[4]) if len(rows) > 1 else flag
+        # ログイン成功時のみ 201 を返す（Burp Intruder 等でステータスコード列を見れば
+        # 成功ペイロードを一目で判別できるようにするための意図的な措置）
         return render_template(
             "dashboard.html",
             username=rows[0][1],
             role=rows[0][3],
             flag=all_flags or flag,
-        )
+        ), 201
 
     return render_template("login.html", error="ユーザー名またはパスワードが違います。"), 401
 
@@ -207,10 +209,11 @@ def upload():
     # 【脆弱性】拡張子チェックなし・サニタイズなしで保存
     save_path = os.path.join(UPLOAD_DIR, f.filename)
     f.save(save_path)
+    # ファイル作成成功を表す 201（ログイン成功時の判別と同様、Burp 等での識別を容易にする）
     return jsonify({
         "status": "アップロード成功",
         "filename": f.filename,
-    })
+    }), 201
 
 
 # -------------------------------------------------------
